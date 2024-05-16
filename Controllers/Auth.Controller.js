@@ -17,15 +17,12 @@ module.exports= {
     register: async(req,res,next)=>{
         console.log(req.body)
         try{
-            // if(!email || !password) throw createError.BadRequest()
                 const result = await UserSchema.validateAsync(req.body)
-            console.log(result,"--------------------------");
             const {email, password} =req.body
             const doesExist = await User.findOne({ email: result.email})
             if(doesExist) throw createError.Conflict('This user already exists')
                 const user = new User(result);
             const savedUser= await user.save()
-            console.log(savedUser,"===============================");
             const accessToken = await signAccessToken(savedUser.id)
             const refreshToken= await signRefreshToken(savedUser.id)
     res.send({savedUser,accessToken, refreshToken})
@@ -38,7 +35,6 @@ module.exports= {
     login: async(req,res,next)=>{
         try{
             
-            // console.log(res.cookie,"============================");
             const result =await UserSchema.validateAsync(req.body)
     
             const user = await User.findOne({email:result.email})
@@ -48,7 +44,6 @@ module.exports= {
             if(!isMatch) throw createError.Unauthorized('Username/password not valid')
             
             const accessToken =await signAccessToken(user.id)
-            console.log(user,"======================================");
             const refreshToken= await signRefreshToken(user.id)
             res.send({accessToken, refreshToken})
             }
@@ -139,7 +134,6 @@ module.exports= {
             }
             Object.assign(user, req.body)
             await user.save()
-            // return stop
             res.send(user)
         } catch (error) {
             console.log(error.message);
